@@ -1,0 +1,129 @@
+Antes de começarmos a compilar o FreSWITCH, devemos instalar os pacotes necessários para a compilação. Este tutorial foi desenvolvido no CentOS 6.3 64 Bits.
+== Ajustando o CentOS 6.3 64 Bits ==
+== Pre-requisitos ==
+* FreeSWITCH com suporte a DOBC
+* Modulo LCR habilitado no FreeSWITCH
+* MySQL Server instalado
+
+=== Pacotes de necessários ===
+<pre>
+yum -y install mysql-server phpmyadmin unixODBC-devel unixODBC mysql-connector-odbc
+</pre>
+
+== Compilando o mod_lcr ==
+
+'''Edite''''
+<pre>vim /usr/src/freeswitch/modules.conf</pre>
+'''Altere''' <pre>#applications/mod_lcr</pre>
+'''Para'''<pre>applications/mod_lcr</pre>
+
+=== Recompile o FreeSWITCH ===
+
+<pre>/etc/init.d/freeswitch stop
+cd /usr/src/freeswitch/
+make
+make install
+</pre>
+== Configurando o FreeSWITCH ==
+
+'''Edite''' <pre>vim /etc/freeswitch/autoload_configs/modules.conf.xml</pre>
+'''Altere''' <pre><--<load module="mod_lcr"/>--></pre>
+'''Para'''<pre><load module="mod_lcr"/></pre>
+
+'''Edite'''<pre> vim /etc/freeswitch/autoload_configs/lcr.conf.xml</pre>
+'''Altere''' <pre><param name="odbc-dsn" value="freeswitch-mysql:freeswitch:Fr33Sw1tch"/></pre>
+'''Para'''<pre><param name="odbc-dsn" value="ODBC:USER:SENHA"/></pre>
+
+== Configurando a ODBC ==
+
+==== Crie o link simbolico ====
+
+<pre>ln -s /usr/lib/libmyodbc5.so /usr/lib/libmyodbc.so</pre>
+
+==== Editando as configurações====
+
+'''Edite'''<pre>vim /etc/odbc.ini</pre>
+'''Adicione'''
+<pre>
+[freeswitch]
+Driver   = MySQL
+SERVER   = localhost
+PORT     = 3306
+DATABASE = lcr
+OPTION  = 67108864
+USER    = USER_MYSQL
+PASSWORD = SENHA_MYSQL
+</pre>
+
+'''Edite'''<pre>vim /etc/odbcinst.ini</pre>
+'''Altere para'''
+<pre>
+[MySQL]
+Description	= ODBC for MySQL
+Driver		= /usr/lib/libmyodbc5.so
+Setup		= /usr/lib/libodbcmyS.so
+Driver64	= /usr/lib64/libmyodbc5.so
+Setup64		= /usr/lib64/libodbcmyS.so
+FileUsage	= 1
+</pre>
+
+== Configurando o MySQL ==
+
+=== Configurando o usuário ===
+<pre>
+/etc/init.d/mysqld start
+/usr/bin/mysqladmin -u root password 'SENHA'
+</pre>
+
+=== Criando a base LCR ===
+
+<pre>
+mysql -u root -pSENHA
+create database lcr;
+quit;
+</pre>
+
+=== Importando criando as tabelas padrão ===
+<pre>
+mysql -u root -pSENHA lcr < /usr/src/freeswitch/src/mod/applications/mod_lcr/sql/mysql-5.0.sql
+</pre>
+
+=== Exemplos para MySQL ===
+
+
+'''carriers'''
+<pre>
+INSERT INTO carriers (id, carrier_name, enabled) VALUES (1, 'carrier1', 1);
+INSERT INTO carriers (id, carrier_name, enabled) VALUES (2, 'carrier2', 1);
+</pre>
+'''gateway info'''
+<pre>
+INSERT INTO carrier_gateway (id, carrier_id, prefix, suffix) VALUES (1, 1, 'sofia/gateway/carrier1/', '');
+INSERT INTO carrier_gateway (id, carrier_id, prefix, suffix) VALUES (2, 2, 'sofia/gateway/carrier2/', '');
+</pre>
+'''lcr data'''
+<pre>
+INSERT INTO lcr (id, digits, rate, carrier_id, lead_strip, trail_strip, prefix, suffix, date_start, date_end, quality, reliability)
+ VALUES (1, '011', 0.15, 1, 0, 0, '', '', current_timestamp - interval 1 year, current_timestamp + interval 1 year , 0, 0);
+INSERT INTO lcr (id, digits, rate, carrier_id, lead_strip, trail_strip, prefix, suffix, date_start, date_end, quality, reliability)
+ VALUES (2, '011', 0.12, 2, 1, 0, '0', '', current_timestamp - interval 1 year, current_timestamp + interval 1 year , 0, 0);
+INSERT INTO lcr (id, digits, rate, carrier_id, lead_strip, trail_strip, prefix, suffix, date_start, date_end, quality, reliability)
+ VALUES (3, '031', 0.05, 1, 0, 0, '', '', current_timestamp - interval 1 year, current_timestamp + interval 1 year , 0, 0);
+INSERT INTO lcr (id, digits, rate, carrier_id, lead_strip, trail_strip, prefix, suffix, date_start, date_end, quality, reliability)
+ VALUES (4, '031', 0.02, 2, 1, 0, '0', '', current_timestamp - interval 1 year, current_timestamp + interval 1 year , 0, 0);
+</pre>
+== Contexto de Saída ==
+
+'''Edite'''<pre>vi /etc/freeswitch/dialplan/default/01_saida.xml</pre>
+
+<pre>
+<include>
+        <extension name="Dial Out">
+          <condition field="destination_number" expression="^(\d{11})$">
+          <action application="lcr" data="$1 default"/>
+          <action application="bridge" data="${lcr_auto_route}"/>-->
+          </condition>
+         </extension>
+</include>
+
+</pre>

@@ -1,0 +1,45 @@
+== Introdução ==
+Este é um guia de instalação rápida genérico para Linux e Unix. Esta página deve permanecer genérica, sem referências para distribuições específicas.
+
+== A quem se destina?  ==
+Experientes de Linux / Unix usuários familiarizados com FreeSWITCH instalação ™ ou quiser um breve resumo sem ler o [Guia de Instalação http://wiki.freeswitch.org/wiki/Installation_Guide].
+
+== Pré-requisitos ==
+
+Debian / Ubuntu:
+<pre>
+apt-get -y update
+        apt-get -y install autoconf automake autotools-dev binutils bison build-essential cpp curl flex g++ gcc git-core libaudiofile-dev libc6-dev libdb-dev libexpat1  \
+libexpat1-dev libgdbm-dev libgnutls-dev libmcrypt-dev libncurses5-dev libnewt-dev libpcre3 libpopt-dev libsctp-dev libsqlite3-dev libtiff4 libtiff4-dev \
+ libtool libx11-dev libxml2 libxml2-dev lksctp-tools lynx m4 make mcrypt ncftp nmap openssl sox sqlite3 ssl-cert ssl-cert unixodbc-dev unzip zip zlib1g-dev zlib1g-dev libssl-dev pkg-config libvorbis0a libogg0 \ 
+libogg-dev libvorbis-dev flite flite1-dev
+     
+</pre>
+
+
+
+== Baixando ==
+
+Git:
+<pre>
+ cd usr/src
+  git clone git://git.freeswitch.org/freeswitch.git
+  cd freeswitch
+  . / Bootstrap.sh
+</pre>
+
+== Editar modules.conf == 
+Este é opcional, mas devemos considerar, seguindo as orientações existentes em: [http://wiki.freeswitch.org/wiki/Installation_Guide#Edit_modules.conf Editar Modulos].
+
+== Compilar o código fonte ==
+
+<pre> 
+ ./configure --without-pgsql --prefix=/usr/local/freeswitch --sysconfdir=/etc/freeswitch/
+</pre>
+
+== Instalando FreeSWITCH ™ ==
+
+<pre>
+  make && make install && make sounds-install && make moh-install
+</pre>
+

@@ -1,0 +1,71 @@
+== Configurando o FreeSWITCH com MongoDB e CDRStats ==
+== Pre-requisitos ==
+Para esta solução iremos instalar o MongoDB em conjunto com o CDRStats (www.cdr-stats.org)
+=== Tarefas===
+
+* Instalar e configurar o MongoDB
+* Recompilar o FreeSWITCH com suporte a MongoDB
+* Realizar altereações nas configurações do FreeSWITCH
+* Instalar e configurar o CDRStats
+
+== Instalando o MongoDB ==
+<pre>
+yum install -y mongodb mongodb-server
+</pre>
+
+==Configurando o MongoDB==
+
+==Recompilando o FreeSWITCH==
+
+'''Acesse'''<pre> cd /usr/src/freeswitch </pre>
+
+No arquivo '''modules.conf''' descomente :
+
+'''Altere'''
+<pre>#event_handlers/mod_cdr_mongodb</pre>
+'''Para'''
+<pre>event_handlers/mod_cdr_mongodb</pre>
+
+'''Recompile o FreeSWITCH'''
+<pre> /etc/init.d/freeswitch stop </pre>
+<pre> make && make install</pre>
+
+==Configurando o FreeSWITCH==
+
+'''Edite''' 
+<pre>vi /etc/freeswitch/autoload_configs/modules.conf.xml</pre>
+
+'''Inclua'''
+<pre><load module="mod_cdr_mongodb"/></pre>
+
+'''Edite''' 
+<pre>vi /etc/freeswitch/autoload_configs/cdr_mongodb.conf.xml</pre>
+
+'''Altere''' <pre><param name="namespace" value="test.cdr"/></pre>
+'''Para''' <pre><param name="namespace" value="freeswitch_cdr.cdr"/></pre>
+'''Altere''' <pre><param name="log-b-leg" value="false"/></pre>
+'''Para''' <pre><param name="log-b-leg" value="true"/></pre>
+
+
+
+==Inciando os serviços==
+
+===MongoDB===
+<pre>
+/etc/init.d/mongod start
+chkconfig --add mongod
+</pre>
+
+===FreeSWITCH===
+<pre> /etc/init.d/freeswitch start </pre>
+
+==Instalando o CDRStats==
+<pre>cd /usr/src</pre>
+<pre>
+wget https://raw.github.com/Star2Billing/cdr-stats/master/install/install-cdr-stats.sh
+</pre>
+
+<pre>bash install-cdr-stats.sh</pre>
+
+===Configurando o CDRStats===
+Para configuração, siga os passos do link: http://www.cdr-stats.org/docs/

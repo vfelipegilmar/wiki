@@ -1,0 +1,13 @@
+
+<pre>
+yum install cpan -y
+perl -MCPAN -e shell
+cpan> o conf prerequisites_policy 'follow'
+cpan> o conf build_requires_install_policy yes
+cpan> o conf commit
+</pre>
+
+<pre>
+wget https://raw.github.com/eluizbr/ASTPP/master/install.sh
+bash install.sh
+</pre>

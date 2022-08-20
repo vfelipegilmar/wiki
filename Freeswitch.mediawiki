@@ -1,0 +1,25 @@
+<h1>Instalando</h1>
+
+[[Instalando o FreeSwitch - UBUNTU 12.04 LTS Server]] <br>
+[[Instalando o FreeSwitch - CentOS 6.3]] <br>
+
+<h1>CDR FreeSwitch MongoDB</h1>
+
+[[CDR]]
+
+<h1> Modulos </h1>
+[[LCR]]<br>
+[[Billing]]<br>
+[[Sip Proxy]]
+
+<h1> Recursos </h1>
+[[DialPlan - Exemplo ]]<br>
+[[Limitando 1 ligação por ramal]]<br>
+[[Gravar ligações]]<br>
+[[Rota por prefixo]]
+
+
+<h1>Segurança</h1>
+
+[[Fail2Ban MODULO]]<br>
+[[Fail2Ban]]
